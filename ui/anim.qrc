@@ -1,0 +1,18 @@
+<RCC>
+  <qresource prefix="icon">
+    <file>../res/pivot.png</file>
+    <file>../res/iconup.png</file>
+    <file>../res/icondown.png</file>
+    <file>../res/iconloop.png</file>
+    <file>../res/icon+.png</file>
+    <file>../res/iconcopy.png</file>
+    <file>../res/icondude.png</file>
+    <file>../res/iconkey.png</file>
+    <file>../res/iconoleft.png</file>
+    <file>../res/smooth.png</file>
+    <file>../res/iconoright.png</file>
+    <file>../res/iconpause.png</file>
+    <file>../res/iconplay.png</file>
+    <file>../res/iconx.png</file>
+  </qresource>
+</RCC>
