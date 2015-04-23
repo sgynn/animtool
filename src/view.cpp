@@ -347,7 +347,7 @@ void View::mouseReleaseEvent(QMouseEvent* event) {
 }
 void View::wheelEvent(QWheelEvent* event) {
 	if(event->modifiers() & Qt::ControlModifier) {
-		float s = event->delta()>0? 1-ZOOM: 1+ZOOM;
+		float s = event->delta()<0? 1-ZOOM: 1+ZOOM;
 		int v = event->delta()<0? -event->delta(): event->delta();
 		while(v>0) { scale(s,s); v -= 15; }
 		event->accept();

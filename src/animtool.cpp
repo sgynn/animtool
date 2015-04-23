@@ -409,7 +409,7 @@ void AnimTool::updateAnimation() {
 	actionDuplicateAnimation-> setEnabled( anim );
 	actionDeleteAnimation	-> setEnabled( anim );
 	frameDataContents	-> setEnabled( anim );
-	frameDetails		-> setEnabled( anim && m_project->currentPart() );
+	frameInfo		-> setEnabled( anim && m_project->currentPart() );
 	actionExportAnimation	-> setEnabled( anim );
 	actionExportFrame	-> setEnabled( anim );
 
@@ -548,8 +548,10 @@ void AnimTool::updateControllerParts() {
 		last = getSelectedPartID(controllerPartB);
 		fillControllerParts(controllerPartB, parent, last, false);
 		if(last>0) parent = m_project->getPart( last );
-		controllerPartB->addItem("<none>");
+		controllerPartB->blockSignals(true);
+		controllerPartB->addItem("<none>", 0);
 		controllerPartB->model()->sort(0);
+		controllerPartB->blockSignals(false);
 	} else controllerPartB->clear();
 
 	// Fill head list
