@@ -33,8 +33,11 @@ class View : public QGraphicsView {
 
 	void displayFrame(Animation* anim, int frame, int before=0,int after=0);//Display a frame
 	void updatePart(Part* part, const Frame& data);				//Update a part to framedata
+	void updateControllers();									//Update all active controllers
 	void setOnionSkin(int before=0, int after=0);				//Change the onion skin
 	void generateCache(Animation* anim, bool override=false);		//Generate cached frame images
+
+	void setAbsoluteRotation(Part* part, float degrees);			// Set part rotation, used by controller
 
 	protected:
 	Project* m_project;							//project

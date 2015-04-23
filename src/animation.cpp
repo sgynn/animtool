@@ -29,6 +29,13 @@ Animation::PartAnim& Animation::partList(Part* part) {
 	return m_frames[id];
 }
 
+void Animation::setControllerState(int id, bool active) {
+	m_ikStates[id] = active;
+}
+bool Animation::getControllerState(int id) const {
+	return m_ikStates.value(id, true); // default on if undefined
+}
+
 int Animation::setKeyframe(int frame, Part* part, Frame& data) {
 	//Insert frame into list
 	data.frame = frame;
@@ -99,7 +106,7 @@ Frame Animation::frameData(int frame, Part* part) {
 	return out;
 }
 
-float Animation::interpolate(int frame, int fa, int fb, float a, float b, bool angle) const {
+float Animation::interpolate(float frame, int fa, int fb, float a, float b, bool angle) const {
 	if(frame==fa || fa==fb) return a;
 	if(fb<fa) fb += m_frameCount;
 	if(frame<fa) frame += m_frameCount;

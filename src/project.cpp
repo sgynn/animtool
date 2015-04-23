@@ -2,10 +2,13 @@
 
 #include "animation.h"
 #include "part.h"
+#include "ik.h"
 
 #include <cstdio>
 
-Project::Project(QObject* parent) : QObject(parent), m_partValue(1), m_animValue(1), m_currentPart(0), m_currentAnimation(0), m_currentFrame(0) {
+Project::Project(QObject* parent) : QObject(parent),
+	m_partValue(1), m_animValue(1), m_controllerValue(1),
+	m_currentPart(0), m_currentAnimation(0), m_currentFrame(0) {
 }
 Project::~Project() {
 	clear();
@@ -16,12 +19,12 @@ Project::~Project() {
 Part* Project::getPart(int id) {
 	return m_parts.value( id, 0 );
 }
-Part* Project::createPart(const QString& name, int id) {
+Part* Project::createPart(const QString& name, int id, bool null) {
 	//Assign id
 	if(id) m_partValue = m_partValue>id? m_partValue: id+1;
 	else id = ++m_partValue;
 	//Create part
-	Part* part = new Part(id);
+	Part* part = new Part(id, null);
 	part->setName( name );
 	part->setData(0, id);
 	return part;
@@ -50,6 +53,25 @@ void Project::removePart(Part* part) {
 	if(m_currentPart==part) m_currentPart = 0;
 	delete part;
 	changedPart(id);
+}
+
+Part* Project::clonePart(Part* part, Part* parent) {
+	Part* p = createPart( part->getName() + "_copy", 0, part->isNull() );
+	addPart(p, parent);
+
+	// Copy data
+	p->setImage( part->pixmap() );
+	p->setSource( part->getSource() );
+	p->setOffset( part->offset() );
+	p->setRest( part->rest() );
+	p->setHidden( part->hidden() );
+	p->setPos( part->pos() );
+	p->setRotation( part->rotation() );
+
+	// Copy animation
+	// TODO
+	
+	return p;
 }
 
 
@@ -137,6 +159,55 @@ const QList<Animation*>& Project::animations() {
 	return m_animations;
 }
 
+//// //// //// //// //// //// //// //// Controllers //// //// //// //// //// //// //// ////
+
+const QList<IKController*>& Project::controllers() const {
+	return m_controllers;
+}
+int Project::getControllerIndex(int id) const {
+	for(int i=0; i<m_controllers.size(); ++i) {
+		if(m_controllers[i]->getID() == id) return i;
+	}
+	return -1;
+}
+IKController* Project::getController(int id) const {
+	foreach(IKController* c, m_controllers) {
+		if(c->getID() == id) return c;
+	}
+	return 0;
+}
+int Project::setController(int id, Part* a, Part* b, Part* h, Part* g) {
+	if(id==0) id = ++m_controllerValue;
+	IKController* ik = new IKController(id, a,b,h,g);
+	// Replace existing one
+	for(int i=0; i<m_controllers.size(); ++i) {
+		if(m_controllers[i]->getID() == id) {
+			delete m_controllers[i];
+			m_controllers[i] = ik;
+			changedController(ik->getID());
+			return id;
+		}
+	}
+	// Add new
+	m_controllers.push_back(ik);
+	changedController(ik->getID());
+	return id;
+}
+void Project::swapControllers(int indexA, int indexB) {
+	m_controllers.swap(indexA, indexB);
+	changedController( m_controllers[indexA]->getID() );
+	changedController( m_controllers[indexB]->getID() );
+}
+void Project::removeController(int id) {
+	for(int i=0; i<m_controllers.size(); ++i) {
+		if(m_controllers[i]->getID() == id) {
+			delete m_controllers[i];
+			m_controllers.removeAt(i);
+			changedController(id);
+			return;
+		}
+	}
+}
 
 //// //// //// //// //// //// //// //// Other Functions //// //// //// //// //// //// //// ////
 
@@ -158,6 +229,11 @@ void Project::clear() {
 	}
 	m_parts.clear();
 	changedPart(0);
+
+	//delete controllers
+	foreach(IKController* c, m_controllers) delete c;
+	m_controllers.clear();
+	changedController(-1);
 
 
 	//Reset other values

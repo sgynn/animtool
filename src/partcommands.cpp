@@ -29,15 +29,22 @@ CreatePart::CreatePart(const QString& name, const QString& source, Part* parent,
 	m_part = id;
 }
 void CreatePart::execute() {
-	Part* part = project()->createPart(m_name, m_part);
-	part->setImage( project()->loadGraphic( m_source ) );
-	if(m_source!=QString::null) part->setSource(m_source);
+	bool nullPart = m_source == QString::null;
+	Part* part = project()->createPart(m_name, m_part, nullPart);
+	if(nullPart) {
+		part->setImage( QPixmap(":/icon/res/null.png") );
+		part->setOffset( QPointF(-12,-12) );
+	} else {
+		part->setImage( project()->loadGraphic( m_source ) );
+		part->setSource(m_source);
+	}
 	m_part = part->getID(); // Save ID in case it was not set
 	//Add to project
 	Part* parent = project()->getPart( m_parent );
 	project()->addPart( part, parent );
 }
 void CreatePart::undo() {
+	
 	project()->removePart( getPart() );
 }
 
@@ -46,18 +53,35 @@ void CreatePart::undo() {
 ClonePart::ClonePart(Part* part) : PartCommand(part) { }
 void ClonePart::execute() {
 	Part* old = getPart();
-	//Create part
-	Part* part = project()->createPart(old->getName()+"_copy");
-	part->setImage( old->pixmap() );
-	part->setSource( old->getSource() );
-	part->setOffset( old->offset() );
-	part->setRest( old->rest() );
-	part->setHidden( old->hidden() );
-	project()->addPart( part, old->getParent() );
-	//TODO Clone all keyframes
+	Part* p = project()->clonePart(old, old->getParent());
+	m_newPart = p->getID();
 }
 void ClonePart::undo() {
-	project()->removePart( getPart() );
+	Part* part = project()->getPart(m_newPart);
+	project()->removePart( part );
+}
+
+//// //// //// //// //// //// //// //// Clone Heirachy //// //// //// //// //// //// //// ////
+
+CloneHeirachy::CloneHeirachy(Part* part) : PartCommand(part) {}
+void CloneHeirachy::execute() {
+	Part* first = getPart();
+	Part* p = project()->clonePart(first, first->getParent());
+	m_parts.push_back(p->getID());
+	cloneChildren(first, p);
+}
+void CloneHeirachy::cloneChildren(Part* src, Part* dst) {
+	foreach(Part* c, src->children()) {
+		Part* p = project()->clonePart(c, dst);
+		m_parts.push_back(p->getID());
+		cloneChildren(c, p);
+	}
+}
+void CloneHeirachy::undo() {
+	foreach(int i, m_parts) {
+		Part* part = project()->getPart(i);
+		project()->removePart(part);
+	}
 }
 
 //// //// //// //// //// //// //// //// Delete Part //// //// //// //// //// //// //// ////

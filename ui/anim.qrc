@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="icon">
+    <file>../res/iconaddnull.png</file>
+    <file>../res/null.png</file>
     <file>../res/pivot.png</file>
     <file>../res/iconup.png</file>
     <file>../res/icondown.png</file>

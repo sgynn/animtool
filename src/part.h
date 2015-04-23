@@ -6,7 +6,7 @@
 
 class Part : public QGraphicsPixmapItem {
 	public:
-	Part(int id) : m_id(id), m_parent(0), m_hidden(0) {}
+	Part(int id, bool null=false) : m_id(id), m_isNull(null), m_parent(0), m_hidden(0) {}
 	int getID() const { return m_id; }				// Get part unique id
 	void setImage(const QPixmap& img) { setPixmap(img); }		// Set part graphic
 	void setName(const QString& s) { m_name = s; }			// Set part name
@@ -24,6 +24,7 @@ class Part : public QGraphicsPixmapItem {
 		m_parent = parent;
 	}
 	QList<Part*>& children() { return m_children; }			// Get list of children
+	bool isNull() const { return m_isNull; }				// Is this part a null marker
 
 	//Base data
 	void setRest(const QPointF& p) { m_rest=p; }			// Set relative rest position
@@ -39,14 +40,14 @@ class Part : public QGraphicsPixmapItem {
 	float   localAngle() const { return m_parent? rotation() - m_parent->rotation(): rotation(); }
 
 	protected:
-	int m_id;			// Part ID
-	QString m_name;			// Part name
-	QString m_source;		// Source image
-	Part* m_parent;			// Parent part
+	int          m_id;			// Part ID
+	bool         m_isNull;		// Null part?
+	QString      m_name;		// Part name
+	QString      m_source;		// Source image
+	Part*        m_parent;		// Parent part
 	QList<Part*> m_children;	// Child parts
-
-	bool m_hidden;			// Hidden by default
-	QPointF m_rest;			// Rest position
+	bool         m_hidden;		// Hidden by default
+	QPointF      m_rest;		// Rest position
 
 	QPointF absoluteRest() { return m_parent? m_parent->absoluteRest()+m_rest: m_rest; }
 };

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1205</width>
-    <height>910</height>
+    <height>1093</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,8 +51,8 @@
     <addaction name="actionAnimations"/>
     <addaction name="actionParts"/>
     <addaction name="actionDetails"/>
-    <addaction name="actionMotion"/>
-    <addaction name="actionScene"/>
+    <addaction name="actionControllers"/>
+    <addaction name="actionSceneInfo"/>
     <addaction name="separator"/>
     <addaction name="menuOnionSkin"/>
     <addaction name="separator"/>
@@ -127,7 +127,7 @@
     <addaction name="actionMoveDown"/>
     <addaction name="separator"/>
     <addaction name="actionAutoKey"/>
-    <addaction name="actionSmoothPlayback"/>
+    <addaction name="actionSmooth"/>
     <addaction name="separator"/>
     <addaction name="actionPlay"/>
    </widget>
@@ -231,7 +231,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="autoKey">
+        <widget class="QPushButton" name="btnAutoKey">
          <property name="maximumSize">
           <size>
            <width>23</width>
@@ -239,7 +239,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Auto Key</string>
+          <string>Auto Key mode</string>
          </property>
          <property name="text">
           <string/>
@@ -381,6 +381,9 @@
            <height>23</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>Animation loop</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -400,16 +403,22 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btnPlay">
+        <widget class="QPushButton" name="btnSmooth">
+         <property name="maximumSize">
+          <size>
+           <width>23</width>
+           <height>23</height>
+          </size>
+         </property>
          <property name="toolTip">
-          <string>Playback Animation</string>
+          <string>Smooth playback mode</string>
          </property>
          <property name="text">
           <string/>
          </property>
          <property name="icon">
           <iconset resource="anim.qrc">
-           <normaloff>:/icon/res/iconplay.png</normaloff>:/icon/res/iconplay.png</iconset>
+           <normaloff>:/icon/res/smooth.png</normaloff>:/icon/res/smooth.png</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -420,19 +429,16 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btnSmooth">
-         <property name="maximumSize">
-          <size>
-           <width>23</width>
-           <height>23</height>
-          </size>
+        <widget class="QPushButton" name="btnPlay">
+         <property name="toolTip">
+          <string>Playback Animation</string>
          </property>
          <property name="text">
           <string/>
          </property>
          <property name="icon">
           <iconset resource="anim.qrc">
-           <normaloff>:/icon/res/smooth.png</normaloff>:/icon/res/smooth.png</iconset>
+           <normaloff>:/icon/res/iconplay.png</normaloff>:/icon/res/iconplay.png</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -481,7 +487,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="animationsFrame">
+  <widget class="QDockWidget" name="frameAnimations">
    <property name="windowTitle">
     <string>Animation</string>
    </property>
@@ -650,7 +656,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="partsFrame">
+  <widget class="QDockWidget" name="frameParts">
    <property name="windowTitle">
     <string>Parts</string>
    </property>
@@ -663,6 +669,15 @@
       <widget class="QTreeView" name="partsList">
        <property name="dragDropMode">
         <enum>QAbstractItemView::InternalMove</enum>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
        </property>
        <property name="textElideMode">
         <enum>Qt::ElideNone</enum>
@@ -686,7 +701,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Create new part</string>
+          <string>Add new part</string>
          </property>
          <property name="text">
           <string/>
@@ -694,6 +709,29 @@
          <property name="icon">
           <iconset resource="anim.qrc">
            <normaloff>:/icon/res/icon+.png</normaloff>:/icon/res/icon+.png</iconset>
+         </property>
+         <property name="flat">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnAddNull">
+         <property name="maximumSize">
+          <size>
+           <width>26</width>
+           <height>26</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Add null part</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="anim.qrc">
+           <normaloff>:/icon/res/iconaddnull.png</normaloff>:/icon/res/iconaddnull.png</iconset>
          </property>
          <property name="flat">
           <bool>true</bool>
@@ -745,9 +783,12 @@
           <string>Parts Edit Mode</string>
          </property>
          <property name="text">
-          <string>Edit</string>
+          <string>Edit Mode</string>
          </property>
          <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="flat">
           <bool>true</bool>
          </property>
         </widget>
@@ -757,7 +798,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="detailsFrame">
+  <widget class="QDockWidget" name="frameDetails">
    <property name="windowTitle">
     <string>Details</string>
    </property>
@@ -770,7 +811,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QWidget" name="frameDetails" native="true">
+      <widget class="QWidget" name="frameInfo" native="true">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -849,12 +890,18 @@
              <property name="text">
               <string>X</string>
              </property>
+             <property name="buddy">
+              <cstring>offsetX</cstring>
+             </property>
             </widget>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_3">
              <property name="text">
               <string>Y</string>
+             </property>
+             <property name="buddy">
+              <cstring>offsetY</cstring>
              </property>
             </widget>
            </item>
@@ -883,11 +930,24 @@
           </layout>
          </widget>
         </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </widget>
      </item>
      <item>
-      <widget class="QWidget" name="partDetails" native="true">
+      <widget class="QWidget" name="partInfo" native="true">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -916,6 +976,9 @@
              <property name="text">
               <string>X</string>
              </property>
+             <property name="buddy">
+              <cstring>pivotX</cstring>
+             </property>
             </widget>
            </item>
            <item row="0" column="1">
@@ -932,6 +995,9 @@
             <widget class="QLabel" name="label_4">
              <property name="text">
               <string>Y</string>
+             </property>
+             <property name="buddy">
+              <cstring>pivotY</cstring>
              </property>
             </widget>
            </item>
@@ -965,6 +1031,9 @@
              <property name="text">
               <string>X</string>
              </property>
+             <property name="buddy">
+              <cstring>positionX</cstring>
+             </property>
             </widget>
            </item>
            <item row="0" column="1">
@@ -982,6 +1051,9 @@
              <property name="text">
               <string>Y</string>
              </property>
+             <property name="buddy">
+              <cstring>positionY</cstring>
+             </property>
             </widget>
            </item>
            <item row="1" column="1">
@@ -997,17 +1069,30 @@
           </layout>
          </widget>
         </item>
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </widget>
      </item>
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="boundsFrame">
+  <widget class="QDockWidget" name="frameSceneInfo">
    <property name="minimumSize">
     <size>
      <width>213</width>
-     <height>85</height>
+     <height>89</height>
     </size>
    </property>
    <property name="windowTitle">
@@ -1031,6 +1116,9 @@
         <widget class="QLabel" name="label_8">
          <property name="text">
           <string>Width</string>
+         </property>
+         <property name="buddy">
+          <cstring>sceneWidth</cstring>
          </property>
         </widget>
        </item>
@@ -1065,6 +1153,9 @@
          <property name="text">
           <string>Height</string>
          </property>
+         <property name="buddy">
+          <cstring>sceneHeight</cstring>
+         </property>
         </widget>
        </item>
        <item>
@@ -1095,114 +1186,298 @@
        </item>
       </layout>
      </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="motionFrame">
+  <widget class="QDockWidget" name="frameControllers">
    <property name="windowTitle">
-    <string>Motion</string>
+    <string>Controllers</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_9">
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_10">
-       <property name="text">
-        <string>Mode</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QComboBox" name="partMode">
-       <item>
-        <property name="text">
-         <string>Keyframes</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Point at Target</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Inverse Kinematics</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_11">
-       <property name="text">
-        <string>Target</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="comboBox">
-       <item>
-        <property name="text">
-         <string>None</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="2" column="0" colspan="2">
-      <widget class="QGroupBox" name="groupBox">
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout_9">
+     <item>
+      <widget class="QGroupBox" name="controllerDetails">
        <property name="title">
-        <string>Limits</string>
+        <string>Add Controller</string>
        </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_7">
-        <item>
+       <layout class="QFormLayout" name="formLayout_2">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::ExpandingFieldsGrow</enum>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>Part A</string>
+          </property>
+          <property name="buddy">
+           <cstring>controllerPartA</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="controllerPartA">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>First part in chain</string>
+          </property>
+          <property name="insertPolicy">
+           <enum>QComboBox::InsertAlphabetically</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
          <widget class="QLabel" name="label_12">
           <property name="text">
-           <string>Min</string>
+           <string>Part B</string>
+          </property>
+          <property name="buddy">
+           <cstring>controllerPartB</cstring>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QDoubleSpinBox" name="minAngle"/>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_7">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="controllerPartB">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
+          <property name="toolTip">
+           <string>Second part in chain (optional)</string>
           </property>
-         </spacer>
+         </widget>
         </item>
-        <item>
+        <item row="2" column="0">
          <widget class="QLabel" name="label_13">
           <property name="text">
-           <string>Max</string>
+           <string>Head</string>
+          </property>
+          <property name="buddy">
+           <cstring>controllerHead</cstring>
           </property>
          </widget>
         </item>
+        <item row="2" column="1">
+         <widget class="QComboBox" name="controllerHead">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>The part that tries to match the goal</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>Goal</string>
+          </property>
+          <property name="buddy">
+           <cstring>controllerGoal</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QComboBox" name="controllerGoal">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>Head part tries to get as close as possible to the goal</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="2">
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QPushButton" name="btnConfirmController">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Add</string>
+            </property>
+            <property name="autoDefault">
+             <bool>false</bool>
+            </property>
+            <property name="default">
+             <bool>false</bool>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnCancelController">
+            <property name="text">
+             <string>Cancel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="controllerView" native="true">
+       <layout class="QVBoxLayout" name="controllerListFrame">
         <item>
-         <widget class="QDoubleSpinBox" name="maxAngle"/>
+         <widget class="QListWidget" name="controllerList"/>
         </item>
         <item>
-         <spacer name="horizontalSpacer_8">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QPushButton" name="btnAddController">
+            <property name="maximumSize">
+             <size>
+              <width>26</width>
+              <height>26</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Add controller</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="anim.qrc">
+              <normaloff>:/icon/res/icon+.png</normaloff>:/icon/res/icon+.png</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnRemoveController">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>26</width>
+              <height>26</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Delete controller</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="anim.qrc">
+              <normaloff>:/icon/res/iconx.png</normaloff>:/icon/res/iconx.png</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btmControllerDown">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>26</width>
+              <height>26</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Change controller order</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="anim.qrc">
+              <normaloff>:/icon/res/icondown.png</normaloff>:/icon/res/icondown.png</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnControllerUp">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>26</width>
+              <height>26</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Change controller order</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="anim.qrc">
+              <normaloff>:/icon/res/iconup.png</normaloff>:/icon/res/iconup.png</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -1331,7 +1606,7 @@
     <string>&amp;Playback</string>
    </property>
    <property name="shortcut">
-    <string>F5</string>
+    <string>F7</string>
    </property>
   </action>
   <action name="actionNextFrame">
@@ -1570,7 +1845,7 @@
     <string>Move to F&amp;ront</string>
    </property>
   </action>
-  <action name="actionSmoothPlayback">
+  <action name="actionSmooth">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -1578,20 +1853,26 @@
     <string>&amp;Smooth playback</string>
    </property>
   </action>
-  <action name="actionScene">
+  <action name="actionSceneInfo">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>&amp;Scene</string>
+    <string>&amp;Scene Info</string>
+   </property>
+   <property name="shortcut">
+    <string>F6</string>
    </property>
   </action>
-  <action name="actionMotion">
+  <action name="actionControllers">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>&amp;Motion</string>
+    <string>&amp;Controllers</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
    </property>
   </action>
  </widget>
@@ -1611,7 +1892,7 @@
   <tabstop>btnDeletePart</tabstop>
   <tabstop>btnEditParts</tabstop>
   <tabstop>btnInsertFrame</tabstop>
-  <tabstop>autoKey</tabstop>
+  <tabstop>btnAutoKey</tabstop>
   <tabstop>onionBefore</tabstop>
   <tabstop>onionAfter</tabstop>
   <tabstop>onionSize</tabstop>
@@ -1622,5 +1903,582 @@
  <resources>
   <include location="anim.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>btnAddController</sender>
+   <signal>clicked()</signal>
+   <receiver>controllerView</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>949</x>
+     <y>965</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1197</x>
+     <y>970</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAddController</sender>
+   <signal>clicked()</signal>
+   <receiver>controllerDetails</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>949</x>
+     <y>965</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1129</x>
+     <y>710</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnConfirmController</sender>
+   <signal>clicked()</signal>
+   <receiver>controllerView</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1056</x>
+     <y>840</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1197</x>
+     <y>970</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnConfirmController</sender>
+   <signal>clicked()</signal>
+   <receiver>controllerDetails</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1056</x>
+     <y>840</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1131</x>
+     <y>710</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnCancelController</sender>
+   <signal>clicked()</signal>
+   <receiver>controllerView</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1189</x>
+     <y>836</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1197</x>
+     <y>970</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnCancelController</sender>
+   <signal>clicked()</signal>
+   <receiver>controllerDetails</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1189</x>
+     <y>836</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1131</x>
+     <y>710</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionControllers</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>frameControllers</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1000</x>
+     <y>701</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>frameControllers</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionControllers</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1000</x>
+     <y>701</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionAnimations</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>frameAnimations</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1000</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionParts</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>frameParts</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1000</x>
+     <y>237</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionDetails</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>frameDetails</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1000</x>
+     <y>433</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSceneInfo</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>frameSceneInfo</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1204</x>
+     <y>646</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>frameAnimations</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionAnimations</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1000</x>
+     <y>91</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>frameDetails</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionDetails</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1000</x>
+     <y>433</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>frameParts</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionParts</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1000</x>
+     <y>237</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>frameSceneInfo</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionSceneInfo</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1204</x>
+     <y>646</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>frameControllers</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>btnCancelController</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1000</x>
+     <y>701</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1189</x>
+     <y>836</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnEditParts</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>actionEditMode</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1173</x>
+     <y>288</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEditMode</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>btnEditParts</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1173</x>
+     <y>288</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAutoKey</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>actionAutoKey</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>150</x>
+     <y>1031</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionAutoKey</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>btnAutoKey</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>150</x>
+     <y>1031</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnSmooth</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>actionSmooth</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1150</x>
+     <y>1031</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSmooth</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>btnSmooth</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1150</x>
+     <y>1031</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnPlay</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>actionPlay</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1196</x>
+     <y>1032</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEditMode</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>frameInfo</receiver>
+   <slot>setHidden(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1056</x>
+     <y>555</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEditMode</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>partInfo</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1100</x>
+     <y>444</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAddAnimation</sender>
+   <signal>pressed()</signal>
+   <receiver>actionAddAnimation</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>945</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAddPart</sender>
+   <signal>clicked()</signal>
+   <receiver>actionAddPart</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>945</x>
+     <y>300</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnDeleteAnimation</sender>
+   <signal>pressed()</signal>
+   <receiver>actionDeleteAnimation</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>997</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnDeletePart</sender>
+   <signal>pressed()</signal>
+   <receiver>actionDeletePart</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>997</x>
+     <y>300</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnCopyAnimation</sender>
+   <signal>pressed()</signal>
+   <receiver>actionDuplicateAnimation</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>971</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>onionBefore</sender>
+   <signal>clicked()</signal>
+   <receiver>actionOnionBefore</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>605</x>
+     <y>1031</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>onionAfter</sender>
+   <signal>clicked()</signal>
+   <receiver>actionOnionAfter</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>628</x>
+     <y>1031</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOnionAfter</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>onionAfter</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>628</x>
+     <y>1031</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOnionBefore</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>onionBefore</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>605</x>
+     <y>1031</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAddNull</sender>
+   <signal>clicked()</signal>
+   <receiver>actionAddNull</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>958</x>
+     <y>288</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

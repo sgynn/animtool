@@ -5,6 +5,7 @@
 
 #include "part.h"
 #include "animation.h"
+#include "ik.h"
 
 #include "xcf.h"
 
@@ -31,6 +32,21 @@ bool Project::loadProject(const QString& filename) {
 		QDomNode node = parts.at(i);
 		if(node.nodeName()=="part") partCount += readPart(&node);
 	}
+
+	// Read controllers
+	for(int i=0; i<parts.count(); i++) {
+		QDomNode node = parts.at(i);
+		if(node.nodeName()=="controller") {
+			QDomNamedNodeMap attr = node.attributes();
+			int id    = attr.namedItem("id").nodeValue().toInt();
+			int partA = attr.namedItem("partA").nodeValue().toInt();
+			int partB = attr.namedItem("partB").nodeValue().toInt();
+			int head  = attr.namedItem("head").nodeValue().toInt();
+			int goal  = attr.namedItem("goal").nodeValue().toInt();
+			setController(id, getPart(partA), getPart(partB), getPart(head), getPart(goal));
+		}
+	}
+	
 
 	// Read animations
 	for(int i=0; i<parts.count(); i++) {
@@ -90,17 +106,23 @@ int Project::readPart(QDomNode* node, int parent) {
 	QPointF pivot  = readPoint( attr.namedItem("pivot") );
 	QPointF offset = readPoint( attr.namedItem("offset") );
 	int     hidden = attr.namedItem("hidden").nodeValue().toInt();
+	bool    null   = file.isEmpty();
+
 	//Fix image path
 	QDir base( m_file.section('/',0,-2) );
 	file = base.absoluteFilePath(file);
 
 	//Create part
-	Part* part = createPart(name, id);
-	part->setSource( file );
-	//part->setImage( QPixmap(file) ); //TODO: xcf layer loading 'file.xcf:layer'
-	part->setImage( loadGraphic(file) );
+	Part* part = createPart(name, id, null);
 	addPart(part, getPart(parent));
-	part->setOffset(-pivot.x(), -pivot.y());
+	if(null) {
+		part->setImage(QPixmap(":/icon/res/null.png"));
+		part->setOffset(-12, -12);
+	} else {
+		part->setSource( file );
+		part->setImage( loadGraphic(file) );
+		part->setOffset(-pivot.x(), -pivot.y());
+	}
 	part->setRest(offset);
 	part->setHidden(hidden);
 	if(part->getParent()) part->setPos( part->getParent()->pos() + offset);
@@ -140,6 +162,18 @@ bool Project::saveProject(const QString& filename) {
 	for(QMap<int, Part*>::iterator i=m_parts.begin(); i!=m_parts.end(); i++) {
 		if(!(*i)->getParent()) writePart(&root, *i);
 	}
+	// Add controllers
+	foreach(IKController* c, m_controllers) {
+		QDomElement cNode = doc.createElement("controller");
+		cNode.setAttribute("id", c->getID());
+		cNode.setAttribute("partA", c->getPartA()->getID());
+		if(c->getPartB()) cNode.setAttribute("partB", c->getPartB()->getID());
+		cNode.setAttribute("head", c->getHead()->getID());
+		cNode.setAttribute("goal", c->getGoal()->getID());
+		root.appendChild(cNode);
+	}
+	
+
 	//Add animations
 	for(int i=0; i<m_animations.size(); i++) {
 		Animation* anim = m_animations[i];
@@ -186,8 +220,10 @@ int Project::writePart(QDomNode* parentNode, Part* part) {
 	QDomElement node = parentNode->ownerDocument().createElement("part");
 	node.setAttribute("id", part->getID());
 	node.setAttribute("name", part->getName());
-	node.setAttribute("file", base.relativeFilePath( part->getSource() ));
-	node.setAttribute("pivot", QString("%1,%2").arg( -part->offset().x() ).arg( -part->offset().y() ));
+	if(!part->isNull()) {
+		node.setAttribute("file", base.relativeFilePath( part->getSource() ));
+		node.setAttribute("pivot", QString("%1,%2").arg( -part->offset().x() ).arg( -part->offset().y() ));
+	}
 	node.setAttribute("offset", QString("%1,%2").arg( part->rest().x() ).arg( part->rest().y() ));
 	node.setAttribute("z", m_scene.items().indexOf(part));
 	if(part->hidden()) node.setAttribute("hidden", 1);

@@ -33,6 +33,19 @@ class ClonePart : public PartCommand {
 	QString text() const { return "clone part"; }
 	void execute();
 	void undo();
+	protected:
+	int m_newPart;
+};
+
+class CloneHeirachy : public PartCommand {
+	public:
+	CloneHeirachy(Part* part);
+	QString text() const { return "clone heirachy"; }
+	void execute();
+	void undo();
+	protected:
+	void cloneChildren(Part* src, Part* dest);
+	QList<int> m_parts;
 };
 
 class DeletePart : public CreatePart {

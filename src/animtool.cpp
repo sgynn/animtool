@@ -2,6 +2,7 @@
 #include "animtool.h"
 #include "part.h"
 #include "animation.h"
+#include "ik.h"
 #include "export.h"
 
 #include <cstdio>
@@ -10,6 +11,7 @@
 #include "partcommands.h"
 #include "animationcommands.h"
 #include "editcommands.h"
+#include "ikcommands.h"
 
 AnimTool::AnimTool(QWidget* parent) {
 	setupUi(this);
@@ -51,7 +53,6 @@ AnimTool::AnimTool(QWidget* parent) {
 	connect(m_timer, SIGNAL( timeout() ), this, SLOT( step() ));
 	connect(actionPlay, SIGNAL( triggered() ), this, SLOT( play() ));
 	connect(playRate,   SIGNAL( valueChanged(double) ), this, SLOT( setRate(double) ));
-	connect(btnPlay,    SIGNAL( clicked() ), actionPlay, SLOT( trigger() ));
 	connect(btnLoop,    SIGNAL( clicked(bool) ), this, SLOT( setLoop(bool) ));
 	//Add pause icon to button
 	QIcon icon = btnPlay->icon();
@@ -71,14 +72,6 @@ AnimTool::AnimTool(QWidget* parent) {
 	connect(actionZoomOut,	SIGNAL(triggered()), this, SLOT(zoomOut()));
 	connect(actionResetZoom,SIGNAL(triggered()), this, SLOT(resetZoom()));
 
-	//Panel visibility
-	connect(animationsFrame, SIGNAL( visibilityChanged(bool) ), actionAnimations, SLOT( setChecked(bool) ));
-	connect(actionAnimations, SIGNAL( triggered(bool) ), animationsFrame, SLOT( setVisible(bool) ));
-	connect(partsFrame, SIGNAL( visibilityChanged(bool) ), actionParts, SLOT( setChecked(bool) ));
-	connect(actionParts, SIGNAL( triggered(bool) ), partsFrame, SLOT( setVisible(bool) ));
-	connect(detailsFrame, SIGNAL( visibilityChanged(bool) ), actionDetails, SLOT( setChecked(bool) ));
-	connect(actionDetails, SIGNAL( triggered(bool) ), detailsFrame, SLOT( setVisible(bool) ));
-
 	//Parts treeview
 	QStandardItemModel* listModel = new QStandardItemModel();
 	QItemSelectionModel* selectModel = new QItemSelectionModel( listModel );
@@ -86,41 +79,36 @@ AnimTool::AnimTool(QWidget* parent) {
 	partsList->setSelectionModel(selectModel);
 
 	//Parts events
-	connect( m_project,		SIGNAL( changedPart(int)), this,	SLOT( updatePartList(int) ));
-	connect( m_project,		SIGNAL( changedSelection(Part*)), this,	SLOT( updatePartSelection() ));
-	connect( selectModel, SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectPart(const QModelIndex&,const QModelIndex&)));
-	connect( listModel,		SIGNAL(itemChanged(QStandardItem*)), this, SLOT(renamePart(QStandardItem*)) );
-	connect( btnAddPart,		SIGNAL( clicked() ), actionAddPart, 	SLOT( trigger() ));
-	connect( btnDeletePart,		SIGNAL( clicked() ), actionDeletePart, 	SLOT( trigger() ));
-	connect( btnEditParts,		SIGNAL( clicked() ), actionEditMode, 	SLOT( trigger() ));
-	connect( actionAddPart,		SIGNAL( triggered() ), this, 		SLOT( addPart() ));
-	connect( actionAddNull,		SIGNAL( triggered() ), this, 		SLOT( addNullPart() ));
-	connect( actionClonePart,	SIGNAL( triggered() ), this, 		SLOT( clonePart() ));
-	connect( actionDeletePart,	SIGNAL( triggered() ), this, 		SLOT( removePart() ));
-	connect( actionMoveForward,	SIGNAL( triggered() ), view, 		SLOT( moveForward() ));
-	connect( actionMoveBack,	SIGNAL( triggered() ), view, 		SLOT( moveBack() ));
-	connect( actionEditMode,	SIGNAL( triggered(bool) ), this, 	SLOT( toggleEdit(bool)) );
-	toggleEdit(false);
+	connect( m_project,           SIGNAL( changedPart(int)), this,	SLOT( updatePartList(int) ));
+	connect( m_project,           SIGNAL( changedSelection(Part*)), this,	SLOT( updatePartSelection() ));
+	connect( selectModel,         SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectPart(const QModelIndex&,const QModelIndex&)));
+	connect( listModel,           SIGNAL(itemChanged(QStandardItem*)), this, SLOT(renamePart(QStandardItem*)) );
+	connect( actionAddPart,       SIGNAL( triggered() ), this, 		SLOT( addPart() ));
+	connect( actionAddNull,       SIGNAL( triggered() ), this, 		SLOT( addNullPart() ));
+	connect( actionClonePart,     SIGNAL( triggered() ), this, 		SLOT( clonePart() ));
+	connect( actionCloneHeirachy, SIGNAL( triggered() ), this, 		SLOT( cloneHeirachy() ));
+	connect( actionDeletePart,    SIGNAL( triggered() ), this, 		SLOT( removePart() ));
+	connect( actionMoveForward,   SIGNAL( triggered() ), view, 		SLOT( moveForward() ));
+	connect( actionMoveBack,      SIGNAL( triggered() ), view, 		SLOT( moveBack() ));
+	connect( actionEditMode,      SIGNAL( triggered(bool) ), view, 	SLOT( setMode(bool)) );
+	partInfo->hide();
 
 	//Animations list
 	listModel = new QStandardItemModel();
 	selectModel = new QItemSelectionModel( listModel );
 	animationList->setModel( listModel );
 	animationList->setSelectionModel(selectModel);
-	connect( m_project,		SIGNAL( changedAnimation(int)), this,	SLOT( updateAnimationList(int) ));
-	connect( m_project,		SIGNAL( changedSelection(Animation*)), this,	SLOT( updateAnimation() ));
-	connect( selectModel,		SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(setAnimation(const QModelIndex&,const QModelIndex&)));
-	connect( listModel,		SIGNAL(itemChanged(QStandardItem*)), this, SLOT(renameAnimation(QStandardItem*)) );
-	connect( btnAddAnimation,	SIGNAL( clicked() ), actionAddAnimation, SLOT( trigger() ));
-	connect( btnCopyAnimation,	SIGNAL( clicked() ), actionDuplicateAnimation, SLOT( trigger() ));
-	connect( btnDeleteAnimation,	SIGNAL( clicked() ), actionDeleteAnimation, SLOT( trigger() ));
-	connect( actionAddAnimation,	SIGNAL( triggered() ), this, SLOT( addAnimation() ));
-	connect( actionDuplicateAnimation, SIGNAL(triggered()), this,SLOT( cloneAnimation() ));
-	connect( actionDeleteAnimation, SIGNAL( triggered() ), this, SLOT( deleteAnimation() ));
-	connect( btnMoveUp,		SIGNAL( clicked() ), actionMoveUp,   SLOT( trigger() ));
-	connect( btnMoveDown,		SIGNAL( clicked() ), actionMoveDown, SLOT( trigger() ));
-	connect( actionMoveUp,		SIGNAL( triggered()), this, SLOT( moveAnimationUp() ));
-	connect( actionMoveDown,	SIGNAL( triggered()), this, SLOT( moveAnimationDown() ));
+	connect( m_project,                SIGNAL( changedAnimation(int)), this,	SLOT( updateAnimationList(int) ));
+	connect( m_project,                SIGNAL( changedSelection(Animation*)), this,	SLOT( updateAnimation() ));
+	connect( selectModel,              SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(setAnimation(const QModelIndex&,const QModelIndex&)));
+	connect( listModel,                SIGNAL(itemChanged(QStandardItem*)), this, SLOT(renameAnimation(QStandardItem*)) );
+	connect( actionAddAnimation,       SIGNAL( triggered() ), this, SLOT( addAnimation() ));
+	connect( actionDuplicateAnimation, SIGNAL( triggered() ), this, SLOT( cloneAnimation() ));
+	connect( actionDeleteAnimation,    SIGNAL( triggered() ), this, SLOT( deleteAnimation() ));
+	connect( btnMoveUp,                SIGNAL( clicked() ),   actionMoveUp,   SLOT( trigger() ));
+	connect( btnMoveDown,              SIGNAL( clicked() ),   actionMoveDown, SLOT( trigger() ));
+	connect( actionMoveUp,             SIGNAL( triggered() ), this, SLOT( moveAnimationUp() ));
+	connect( actionMoveDown,           SIGNAL( triggered() ), this, SLOT( moveAnimationDown() ));
 
 	//Animations - how to do this??
 	m_frameModel = new TableModel();
@@ -133,30 +121,39 @@ AnimTool::AnimTool(QWidget* parent) {
 	frameList->verticalHeader()->setMinimumSectionSize(4);
 	frameList->setSelectionModel(selectModel);
 
+	//Controllers
+	connect( btnAddController,     SIGNAL( clicked() ), this, SLOT( updateControllerParts() ));
+	connect( btnRemoveController,  SIGNAL( clicked() ), this, SLOT( removeController() ));
+	connect( controllerPartA,      SIGNAL( currentIndexChanged(int) ), this, SLOT( updateControllerParts() ));
+	connect( controllerPartB,      SIGNAL( currentIndexChanged(int) ), this, SLOT( updateControllerParts() ));
+	connect( controllerHead,       SIGNAL( currentIndexChanged(int) ), this, SLOT( updateControllerParts() ));
+	connect( controllerPartA,      SIGNAL( currentIndexChanged(int) ), this, SLOT( validateController() ));
+	connect( controllerPartB,      SIGNAL( currentIndexChanged(int) ), this, SLOT( validateController() ));
+	connect( controllerHead,       SIGNAL( currentIndexChanged(int) ), this, SLOT( validateController() ));
+	connect( controllerGoal,       SIGNAL( currentIndexChanged(int) ), this, SLOT( validateController() ));
+	connect( btnConfirmController, SIGNAL( clicked() ), this, SLOT( addController() ));
+	connect( m_project,            SIGNAL( changedController(int) ), this, SLOT(updateControllerList(int) ));
+	connect( controllerList,       SIGNAL( currentRowChanged(int) ), this, SLOT(controllerSelected(int) ));
+
 	//Frame controls
 	connect( selectModel,    SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectFrame(const QModelIndex&,const QModelIndex&)));
-	connect( frameCount,     SIGNAL( valueChanged(int) ),	this, SLOT( setFrameCount(int) ));
-	connect( btnInsertFrame, SIGNAL( clicked() ),		this, SLOT( insertFrame() ));
-	connect( btnDeleteFrame, SIGNAL( clicked() ),		this, SLOT( deleteFrame() ));
-	connect( autoKey,	 SIGNAL( clicked() ), actionAutoKey,  SLOT( trigger() ));
-	connect( actionAutoKey,	 SIGNAL( triggered(bool) ),	view, SLOT( setAutoKey(bool) ));
+	connect( frameCount,     SIGNAL( valueChanged(int) ),	this,  SLOT( setFrameCount(int) ));
+	connect( btnInsertFrame, SIGNAL( clicked() ),		this,      SLOT( insertFrame() ));
+	connect( btnDeleteFrame, SIGNAL( clicked() ),		this,      SLOT( deleteFrame() ));
+	connect( actionAutoKey,	 SIGNAL( triggered(bool) ), view,      SLOT( setAutoKey(bool) ));
 
 	//Onion Skin
-	connect( onionBefore,	    SIGNAL( clicked() ), actionOnionBefore, SLOT( trigger() ));
-	connect( onionAfter,	    SIGNAL( clicked() ), actionOnionAfter,  SLOT( trigger() ));
-	connect( actionOnionBefore, SIGNAL( triggered(bool) ), onionBefore, SLOT( setChecked(bool) ));
-	connect( actionOnionAfter,  SIGNAL( triggered(bool) ), onionAfter,  SLOT( setChecked(bool) ));
-	connect( actionOnionBefore, SIGNAL( triggered(bool) ), this,        SLOT( updateOnionSkin() ));
-	connect( actionOnionAfter,  SIGNAL( triggered(bool) ), this,        SLOT( updateOnionSkin() ));
-	connect( onionSize,	    SIGNAL( valueChanged(int) ), this,      SLOT( updateOnionSkin() ));
+	connect( actionOnionBefore, SIGNAL( triggered(bool) ), this,   SLOT( updateOnionSkin() ));
+	connect( actionOnionAfter,  SIGNAL( triggered(bool) ), this,   SLOT( updateOnionSkin() ));
+	connect( onionSize,	        SIGNAL( valueChanged(int) ), this, SLOT( updateOnionSkin() ));
 	
 	//Details
 	connect( frameAngle,	SIGNAL( toggled(bool) ),	this, SLOT( changeFrameMode() ));
 	connect( frameOffset,	SIGNAL( toggled(bool) ),	this, SLOT( changeFrameMode() ));
 	connect( frameVisible,	SIGNAL( toggled(bool) ),	this, SLOT( changeFrameMode() ));
 	connect( angleValue,	SIGNAL( valueChanged(double) ), this, SLOT( changeAngleValue(double) ));
-	connect( offsetX,	SIGNAL( valueChanged(double) ), this, SLOT( changeOffsetValue() ));
-	connect( offsetY,	SIGNAL( valueChanged(double) ), this, SLOT( changeOffsetValue() ));
+	connect( offsetX,	    SIGNAL( valueChanged(double) ), this, SLOT( changeOffsetValue() ));
+	connect( offsetY,	    SIGNAL( valueChanged(double) ), this, SLOT( changeOffsetValue() ));
 	connect( frameHidden,	SIGNAL( toggled(bool) ),	this, SLOT( changeHiddenValue(bool) ));
 
 	connect( pivotX,	SIGNAL( valueChanged(double) ), this, SLOT( changePivotValue() ));
@@ -166,10 +163,8 @@ AnimTool::AnimTool(QWidget* parent) {
 	connect( partHidden,	SIGNAL( toggled(bool) ),	this, SLOT( changeRestHidden(bool) ));
 
 	//connect( view, SIGNAL( partChanged(Part*) ), this, SLOT( editPart(Part*) ));
-	connect( actionNextFrame,	SIGNAL( triggered() ), this, SLOT( nextFrame() ));
+	connect( actionNextFrame,		SIGNAL( triggered() ), this, SLOT( nextFrame() ));
 	connect( actionPreviousFrame,	SIGNAL( triggered() ), this, SLOT( previousFrame() ));
-
-	
 }
 
 void AnimTool::nextFrame() {
@@ -297,7 +292,7 @@ void AnimTool::updatePartList(int id) {
 		if(!parent) parent = static_cast<QStandardItemModel*>( partsList->model() )->invisibleRootItem();
 		parent->appendRow( item );
 		//Set formatting
-		if(part->pixmap().isNull()) {
+		if(part->isNull()) {
 			QFont font = item->font(); font.setItalic(true);
 			item->setFont( font );
 		}
@@ -324,9 +319,9 @@ void AnimTool::updatePartSelection() {
 	actionCloneHeirachy	-> setEnabled( enabled );
 	actionMoveForward	-> setEnabled( enabled );
 	actionMoveBack		-> setEnabled( enabled );
-	partDetails			-> setEnabled( enabled );
-	frameDetails		-> setEnabled( enabled && m_project->currentAnimation() );
-	partPivot			-> setEnabled( enabled && !part->pixmap().isNull() );
+	partInfo			-> setEnabled( enabled );
+	frameInfo			-> setEnabled( enabled && m_project->currentAnimation() );
+	partPivot			-> setEnabled( enabled && !part->isNull() );
 	updateDetails( part );
 	refreshFrames();
 	//Select in view
@@ -376,6 +371,11 @@ void AnimTool::clonePart() {
 	if(old) m_commands->push( new ClonePart(old) );
 }
 
+void AnimTool::cloneHeirachy() {
+	Part* old = m_project->currentPart();
+	if(old) m_commands->push( new CloneHeirachy(old) );
+}
+
 void AnimTool::importXCF() {
 	QString file = QFileDialog::getOpenFileName( this, "Import Parts from Image", QString::null, "XCF Images (*.xcf)" );
 	if(file!=QString::null) m_project->importXCF(file);
@@ -386,13 +386,6 @@ void AnimTool::removePart() {
 	if(m_project->currentPart()) {
 		m_commands->push( new DeletePart( m_project->currentPart() ) );
 	}
-}
-
-void AnimTool::toggleEdit(bool edit) {
-	view->setMode(edit);
-	btnEditParts->setChecked(edit);
-	if(edit) { frameDetails->hide(); partDetails->show(); }
-	else { partDetails->hide(); frameDetails->show(); }
 }
 
 //// //// //// //// //// //// //// //// Animation List //// //// //// //// //// //// //// ////
@@ -419,6 +412,9 @@ void AnimTool::updateAnimation() {
 	frameDetails		-> setEnabled( anim && m_project->currentPart() );
 	actionExportAnimation	-> setEnabled( anim );
 	actionExportFrame	-> setEnabled( anim );
+
+	// Update controller states
+	// ToDo
 	
 	//Animation frames
 	static_cast<TableModel*>(frameList->model()) -> setAnimation( anim );
@@ -495,6 +491,124 @@ void AnimTool::moveAnimationUp() {
 	int index = animationList->currentIndex().isValid()? animationList->currentIndex().row(): -1;
 	m_project->moveAnimation( m_project->currentAnimation(), index-1);
 }
+
+//// //// //// //// //// //// //// //// Controllers //// //// //// //// //// //// //// ////
+
+void AnimTool::controllerSelected(int index) {
+	btnRemoveController->setEnabled(index>=0);
+}
+
+void AnimTool::updateControllerList(int id) {
+	IKController* data = m_project->getController(id);
+	// Refresh entire list
+	if(id<0) {
+		controllerList->clear();
+		foreach(IKController* c, m_project->controllers()) {
+			bool active = m_project->currentAnimation() && m_project->currentAnimation()->getControllerState(c->getID());
+			QListWidgetItem* item = new QListWidgetItem(c->getName());
+			item->setData(Qt::UserRole, c->getID());
+			item->setCheckState( active? Qt::Checked: Qt::Unchecked );
+		}
+	}
+	// Update/Add controller
+	else if(data) {
+		int index = m_project->getControllerIndex(id);
+		if(index == controllerList->count()) controllerList->addItem("-");
+		QListWidgetItem* item = controllerList->item(index);
+		// Update item
+		item->setData(Qt::UserRole, id);
+		item->setText( data->getName() );
+
+		Animation* anim = m_project->currentAnimation();
+		bool state = anim? anim->getControllerState(id): true;
+		item->setCheckState( state? Qt::Checked: Qt::Unchecked);
+	}
+	// Delete controller from list
+	else {
+		for(int i=0; i<controllerList->count(); ++i) {
+			if(controllerList->item(i)->data(Qt::UserRole).toInt() == id) {
+				controllerList->takeItem(i);
+				return;
+			}
+		}
+	}
+	btnRemoveController->setEnabled( controllerList->currentItem()>=0 );
+}
+inline int getSelectedPartID(QComboBox* box) {
+	return box->itemData( box->currentIndex() ).toInt();
+}
+void AnimTool::updateControllerParts() {
+	// Fill part list A
+	int last = getSelectedPartID(controllerPartA);
+	fillControllerParts(controllerPartA, 0, last, false);
+
+	// Fill part list B
+	Part* parent = m_project->getPart( last );
+	if(parent) {
+		last = getSelectedPartID(controllerPartB);
+		fillControllerParts(controllerPartB, parent, last, false);
+		if(last>0) parent = m_project->getPart( last );
+		controllerPartB->addItem("<none>");
+		controllerPartB->model()->sort(0);
+	} else controllerPartB->clear();
+
+	// Fill head list
+	if(parent) {
+		last = getSelectedPartID(controllerHead);
+		fillControllerParts(controllerHead, parent, last, false);
+	} else controllerHead->clear();
+
+	// Fill goal list (nulls only)
+	last = getSelectedPartID(controllerGoal);
+	fillControllerParts(controllerGoal, 0, last, true);
+	validateController();
+}
+
+void AnimTool::fillControllerParts(QComboBox* list, Part* parent, int value, bool nullsOnly) {
+	list->blockSignals(true);
+	list->clear();
+	if(parent) {
+		QList<Part*> parts = parent->children();
+		for(int i=0; i<parts.size(); ++i) {
+			list->addItem(parts[i]->getName(), parts[i]->getID());
+			parts.append(parts[i]->children());
+		}
+	} else {
+		QList<Part*> parts = m_project->parts();
+		foreach(Part* p, parts) {
+			if(!nullsOnly || p->isNull()) list->addItem(p->getName(), p->getID());
+		}
+	}
+	list->model()->sort(0);
+	list->setCurrentIndex( list->findData(value) );
+	list->blockSignals(false);
+}
+void AnimTool::validateController() {
+	QVariant a = controllerPartA->itemData( controllerPartA->currentIndex() );
+	QVariant h = controllerHead->itemData( controllerHead->currentIndex() );
+	QVariant g = controllerGoal->itemData( controllerGoal->currentIndex() );
+	bool valid = a.toInt() && h.toInt() && g.toInt();
+	btnConfirmController->setEnabled(valid);
+}
+
+void AnimTool::addController() {
+	QVariant a = controllerPartA->itemData( controllerPartA->currentIndex() );
+	QVariant b = controllerPartB->itemData( controllerPartB->currentIndex() );
+	QVariant h = controllerHead->itemData( controllerHead->currentIndex() );
+	QVariant g = controllerGoal->itemData( controllerGoal->currentIndex() );
+	m_commands->push( new SetController(0, a.toInt(), b.toInt(), h.toInt(), g.toInt()) );
+}
+
+void AnimTool::removeController() {
+	QVariant data = controllerList->currentIndex().data(Qt::UserRole);
+	IKController* c = m_project->getController( data.toInt() );
+	if(c) m_commands->push( new DeleteController( c ) );
+}
+
+//void AnimTool::moveControllerUp() {
+//	int index = controllerList->currentIndex().row();
+//	m_commands->push( new ChangeControllerOrder(index, index-1) );
+//}
 
 //// //// //// //// //// //// //// //// Frame Buttons //// //// //// //// //// //// //// ////
 

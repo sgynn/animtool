@@ -15,7 +15,9 @@ SET( source
 	src/partcommands.cpp
 	src/animationcommands.cpp
 	src/editcommands.cpp
+	src/ikcommands.cpp
 	src/export.cpp
+	src/ik.cpp
 )
 
 SET( headers
@@ -31,7 +33,9 @@ SET( headers
 	src/partcommands.h
 	src/animationcommands.h
 	src/editcommands.h
+	src/ikcommands.h
 	src/export.h
+	src/ik.h
 )
 
 # Headers using Q_OBJECT macro

@@ -42,6 +42,9 @@ class Animation {
 
 	QList<int> parts() const;				// Get a list of all the parts with keyframes
 
+	void setControllerState(int id, bool active);	// Set theactive state of a controller
+	bool getControllerState(int id) const;			// Is a controller active?
+
 	void insertFrame(int index);				// Insert a frame at index
 	void deleteFrame(int index);				// delete a frame
 	
@@ -65,10 +68,12 @@ class Animation {
 	typedef QMap<int, PartAnim> PartMap;	// Part animation map
 	PartMap m_frames;			// One animation per part
 
+	QMap<int, bool> m_ikStates;	// Which ik controllers are active for this animation
+
 	QList<CachedImage> m_cache;		// Rendered frame images
 
 	PartAnim& partList(Part* part);		// Get/create animation frame list for a part
-	float interpolate(int frame, int fa, int fb, float va, float vb, bool angle=false) const;
+	float interpolate(float frame, int fa, int fb, float va, float vb, bool angle=false) const;
 };
 
 #endif

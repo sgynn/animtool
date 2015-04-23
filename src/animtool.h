@@ -52,10 +52,18 @@ class AnimTool : public QMainWindow, private Ui::MainWindow {
 	void addPart();
 	void addNullPart();
 	void clonePart();
+	void cloneHeirachy();
 	void removePart();
 	void renamePart(QStandardItem*);
 	void selectPart(const QModelIndex&, const QModelIndex&);
-	void toggleEdit(bool mode);
+
+	void controllerSelected(int);
+	void updateControllerList(int);
+	void updateControllerParts();
+	void addController();
+	void removeController();
+	void fillControllerParts(QComboBox*, Part*, int, bool);
+	void validateController();
 
 	void updateAnimation();
 	void updateAnimationList(int id);

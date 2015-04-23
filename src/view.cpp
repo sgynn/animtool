@@ -8,6 +8,7 @@
 #include "project.h"
 #include "part.h"
 #include "animation.h"
+#include "ik.h"
 
 #include "editcommands.h"
 
@@ -108,6 +109,25 @@ void View::updateAll(Animation* anim, int frame) {
 			updatePart(all[i], all[i]->hidden()? Animation::nullFrameHidden: Animation::nullFrame);
 		}
 	}
+
+
+	// Update active controllers
+	updateControllers();
+}
+
+void View::updateControllers() {
+	Animation* anim = m_project->currentAnimation();
+	foreach(IKController* c, m_project->controllers()) {
+		if(!anim || anim->getControllerState(c->getID())) {
+			c->apply(this);
+		}
+	}
+}
+void View::setAbsoluteRotation(Part* p, float rot) {
+	float delta = (rot - p->rotation()) * PI/180;
+	rotateChildren(p, p->pos(), delta);
+	p->setRotation(rot);
+	updateSelection();
 }
 
 
@@ -250,17 +270,19 @@ void View::mousePressEvent(QMouseEvent* event) {
 	m_moved = false;
 	//Are we over the pivot?
 	#define DIST2(a,b) ((a.x()-b.x())*(a.x()-b.x()) + (a.y()-b.y())*(a.y()-b.y()))
-	float pRadius = 10 / transform().m11();
-	bool onPivot = DIST2(mpos, m_pivot->pos()) < pRadius*pRadius;
-	if(onPivot || m_edit) {
-		m_mode = m_edit^onPivot? 1: 3; // move / set Pivot
-		m_moveOffset = mpos - m_pivot->pos();
-	} else if(m_selected) {
-		m_mode = 2; //rotate
-		m_angleOffset = atan2(mpos.y()-m_pivot->pos().y(), mpos.x()-m_pivot->pos().x());
-		m_angleOffset -= m_selected->rotation() * PI/180;
-		if(m_angleOffset<-PI) m_angleOffset+=2*PI;
-		else if(m_angleOffset>PI) m_angleOffset-=2*PI;
+	if(m_selected) {
+		float pRadius = 10 / transform().m11();
+		bool onPivot = DIST2(mpos, m_pivot->pos()) < pRadius*pRadius;
+		if(onPivot || m_edit) {
+			m_mode = m_edit && onPivot && !m_selected->isNull()? 3: 1; // Set pivot or Move
+			m_moveOffset = mpos - m_pivot->pos();
+		} else {
+			m_mode = 2; //rotate
+			m_angleOffset = atan2(mpos.y()-m_pivot->pos().y(), mpos.x()-m_pivot->pos().x());
+			m_angleOffset -= m_selected->rotation() * PI/180;
+			if(m_angleOffset<-PI) m_angleOffset+=2*PI;
+			else if(m_angleOffset>PI) m_angleOffset-=2*PI;
+		}
 	}
 	//Scene size
 	float dist = 3.0f / transform().m11();
@@ -280,16 +302,19 @@ void View::mouseMoveEvent(QMouseEvent* event) {
 			move = mpos - m_moveOffset - m_selected->pos();
 			if(m_edit) moveRest( m_selected, move );
 			else if(m_animation) movePart( m_selected, move );
+			if(!m_edit) updateControllers();
 			break;
 		case 2: //rotate
 			angle = atan2(mpos.y()-m_pivot->pos().y(), mpos.x()-m_pivot->pos().x()) - m_angleOffset;
 			rotatePart(m_selected, angle - m_selected->rotation()*PI/180);
+			updateControllers();
 			break;
 		case 3: //Move pivot
 			m_pivot->setPos(mpos);
 			if(m_selected->getParent()) m_parentLine->setLine(mpos.x(), mpos.y(), m_selected->getParent()->x(), m_selected->getParent()->y());
 			break;
 		}
+
 	}
 	//Scene Size
 	if(m_mode&0xf0) {
