@@ -62,25 +62,35 @@ bool Project::loadProject(const QString& filename) {
 			anim->setFrameCount(frames<1?1:frames);
 			anim->setFrameRate(fps>0?fps:15.0);
 			anim->setLoop(loop);
+
 			//Read parts
 			QDomNodeList parts = node.childNodes();
 			for(int p=0; p<parts.count(); p++) {
-				int id = parts.at(p).attributes().namedItem("id").nodeValue().toInt();
-				Part* part = getPart(id);
-				//Read keyframes
-				if(part) for(int j=0; j<parts.at(p).childNodes().count(); j++) {
-					QDomNamedNodeMap data = parts.at(p).childNodes().at(j).attributes();
-					Frame frame; frame.mode=0;
-					frame.frame = data.namedItem("number").nodeValue().toInt();
-					frame.mode |= data.namedItem("angle").isNull()?  0: 1;
-					frame.mode |= data.namedItem("offset").isNull()? 0: 2;
-					frame.mode |= data.namedItem("hidden").isNull()? 0: 4;
-					//Values
-					frame.angle = data.namedItem("angle").nodeValue().toFloat();
-					frame.offset = readPoint( data.namedItem("offset") );
-					frame.visible = !data.namedItem("hidden").nodeValue().toInt();
-					//Add frame to animation
-					anim->setKeyframe(frame.frame, part, frame);
+				// Controller states
+				if(parts.at(p).nodeName() == "controller") {
+					int  id = parts.at(p).attributes().namedItem("id").nodeValue().toInt();
+					bool active = parts.at(p).attributes().namedItem("active").nodeValue().toInt();
+					anim->setControllerState(id, active);
+				}
+				// Part states
+				else {
+					int id = parts.at(p).attributes().namedItem("id").nodeValue().toInt();
+					Part* part = getPart(id);
+					//Read keyframes
+					if(part) for(int j=0; j<parts.at(p).childNodes().count(); j++) {
+						QDomNamedNodeMap data = parts.at(p).childNodes().at(j).attributes();
+						Frame frame; frame.mode=0;
+						frame.frame = data.namedItem("number").nodeValue().toInt();
+						frame.mode |= data.namedItem("angle").isNull()?  0: 1;
+						frame.mode |= data.namedItem("offset").isNull()? 0: 2;
+						frame.mode |= data.namedItem("hidden").isNull()? 0: 4;
+						//Values
+						frame.angle = data.namedItem("angle").nodeValue().toFloat();
+						frame.offset = readPoint( data.namedItem("offset") );
+						frame.visible = !data.namedItem("hidden").nodeValue().toInt();
+						//Add frame to animation
+						anim->setKeyframe(frame.frame, part, frame);
+					}
 				}
 			}
 			//Add animation to project
@@ -182,7 +192,16 @@ bool Project::saveProject(const QString& filename) {
 		aNode.setAttribute("length", anim->frameCount());
 		aNode.setAttribute("fps", anim->frameRate());
 		aNode.setAttribute("loop", anim->loop()?1:0);
-		//Add part
+
+		// Add controller states
+		foreach(IKController* c, m_controllers) {
+			QDomElement pNode = doc.createElement("controller");
+			pNode.setAttribute("id", c->getID());
+			pNode.setAttribute("active", anim->getControllerState(c->getID()));
+			aNode.appendChild(pNode);
+		}
+
+		//Add parts
 		for(QMap<int, Part*>::iterator p=m_parts.begin(); p!=m_parts.end(); p++) {
 			QDomElement pNode = doc.createElement("part");
 			pNode.setAttribute("id", p.key());

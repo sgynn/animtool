@@ -57,12 +57,13 @@ class AnimTool : public QMainWindow, private Ui::MainWindow {
 	void renamePart(QStandardItem*);
 	void selectPart(const QModelIndex&, const QModelIndex&);
 
-	void controllerSelected(int);
+	void controllerSelected();
 	void updateControllerList(int);
 	void updateControllerParts();
 	void addController();
 	void removeController();
 	void fillControllerParts(QComboBox*, Part*, int, bool);
+	void controllerStateChanged(QListWidgetItem*);
 	void validateController();
 
 	void updateAnimation();

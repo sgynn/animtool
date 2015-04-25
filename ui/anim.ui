@@ -1092,11 +1092,11 @@
    <property name="minimumSize">
     <size>
      <width>213</width>
-     <height>89</height>
+     <height>114</height>
     </size>
    </property>
    <property name="windowTitle">
-    <string>Scene size</string>
+    <string>Scene Info</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -1107,6 +1107,9 @@
       <widget class="QCheckBox" name="autoSize">
        <property name="text">
         <string>Autosize</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -1185,6 +1188,16 @@
         </spacer>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="showNulls">
+       <property name="text">
+        <string>Show Null Parts</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="verticalSpacer">

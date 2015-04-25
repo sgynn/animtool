@@ -133,7 +133,8 @@ AnimTool::AnimTool(QWidget* parent) {
 	connect( controllerGoal,       SIGNAL( currentIndexChanged(int) ), this, SLOT( validateController() ));
 	connect( btnConfirmController, SIGNAL( clicked() ), this, SLOT( addController() ));
 	connect( m_project,            SIGNAL( changedController(int) ), this, SLOT(updateControllerList(int) ));
-	connect( controllerList,       SIGNAL( currentRowChanged(int) ), this, SLOT(controllerSelected(int) ));
+	connect( controllerList,       SIGNAL( itemSelectionChanged() ), this, SLOT(controllerSelected() ));
+	connect( controllerList,       SIGNAL( itemChanged(QListWidgetItem*) ), this, SLOT( controllerStateChanged(QListWidgetItem*) ));
 
 	//Frame controls
 	connect( selectModel,    SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectFrame(const QModelIndex&,const QModelIndex&)));
@@ -414,7 +415,8 @@ void AnimTool::updateAnimation() {
 	actionExportFrame	-> setEnabled( anim );
 
 	// Update controller states
-	// ToDo
+	updateControllerList(-1);
+	
 	
 	//Animation frames
 	static_cast<TableModel*>(frameList->model()) -> setAnimation( anim );
@@ -494,12 +496,23 @@ void AnimTool::moveAnimationUp() {
 
 //// //// //// //// //// //// //// //// Controllers //// //// //// //// //// //// //// ////
 
-void AnimTool::controllerSelected(int index) {
-	btnRemoveController->setEnabled(index>=0);
+void AnimTool::controllerSelected() {
+	btnRemoveController->setEnabled( !controllerList->selectedItems().empty() );
+	printf("Moo\n");
+}
+
+void AnimTool::controllerStateChanged(QListWidgetItem* item) {
+	Animation* anim = m_project->currentAnimation();
+	if(!anim) item->setCheckState( Qt::Checked );
+	else {
+		anim->setControllerState(item->data(Qt::UserRole).toInt(), item->checkState() == Qt::Checked);
+		setFrame(-1);
+	}
 }
 
 void AnimTool::updateControllerList(int id) {
 	IKController* data = m_project->getController(id);
+	controllerList->blockSignals(true);
 	// Refresh entire list
 	if(id<0) {
 		controllerList->clear();
@@ -508,6 +521,7 @@ void AnimTool::updateControllerList(int id) {
 			QListWidgetItem* item = new QListWidgetItem(c->getName());
 			item->setData(Qt::UserRole, c->getID());
 			item->setCheckState( active? Qt::Checked: Qt::Unchecked );
+			controllerList->addItem( item );
 		}
 	}
 	// Update/Add controller
@@ -528,11 +542,12 @@ void AnimTool::updateControllerList(int id) {
 		for(int i=0; i<controllerList->count(); ++i) {
 			if(controllerList->item(i)->data(Qt::UserRole).toInt() == id) {
 				controllerList->takeItem(i);
-				return;
+				break;
 			}
 		}
 	}
-	btnRemoveController->setEnabled( controllerList->currentItem()>=0 );
+	controllerList->blockSignals(false);
+	btnRemoveController->setEnabled( !controllerList->selectedItems().empty() );
 }
 inline int getSelectedPartID(QComboBox* box) {
 	return box->itemData( box->currentIndex() ).toInt();
