@@ -47,6 +47,9 @@ class AnimTool : public QMainWindow, private Ui::MainWindow {
 	void exportAnimation();
 	void exportAll();
 
+	void copyFrameData();	// Clipboard actions
+	void pasteFrameData();
+
 	void updatePartList(int id);	// add/delete part from list
 	void updatePartSelection();	// Change what is selected
 	void addPart();

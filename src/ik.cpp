@@ -46,7 +46,7 @@ void IKController::apply(View* v) const {
 		float lg = distance(m_partA->pos(), m_goal->pos());
 
 		// out of range - lookat
-		if(lg >= la + lb) {
+		if(lg >= la + lb || lg <= abs(la-lb)) {
 			lookat(v, m_partA, m_partB, m_goal->pos());
 			lookat(v, m_partB, m_head, m_goal->pos());
 		}
@@ -57,7 +57,7 @@ void IKController::apply(View* v) const {
 			QPointF c = m_head->pos() - b;
 			QPointF g = m_goal->pos() - a;
 
-			float d = lg * la / (la+lb);
+			float d = (lg*lg + la*la - lb*lb) / (2*lg);
 			float r = sqrt(la*la - d*d);
 			
 			QPointF n(g.y()/lg, -g.x()/lg);

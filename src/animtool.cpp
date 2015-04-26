@@ -61,11 +61,11 @@ AnimTool::AnimTool(QWidget* parent) {
 	
 
 	//Menu
-	connect(actionNewProject,	SIGNAL(triggered()), this, SLOT(newProject()));
-	connect(actionLoadProject,	SIGNAL(triggered()), this, SLOT(loadProject()));
-	connect(actionSaveProject,	SIGNAL(triggered()), this, SLOT(saveProject()));
-	connect(actionSaveProjectAs,	SIGNAL(triggered()), this, SLOT(saveProjectAs()));
-	connect(actionImportXCF,	SIGNAL(triggered()), this, SLOT(importXCF()));
+	connect(actionNewProject,    SIGNAL(triggered()), this, SLOT(newProject()));
+	connect(actionLoadProject,   SIGNAL(triggered()), this, SLOT(loadProject()));
+	connect(actionSaveProject,   SIGNAL(triggered()), this, SLOT(saveProject()));
+	connect(actionSaveProjectAs, SIGNAL(triggered()), this, SLOT(saveProjectAs()));
+	connect(actionImportXCF,     SIGNAL(triggered()), this, SLOT(importXCF()));
 	
 	//View Menu
 	connect(actionZoomIn,	SIGNAL(triggered()), this, SLOT(zoomIn()));
@@ -120,6 +120,11 @@ AnimTool::AnimTool(QWidget* parent) {
 	frameList->horizontalHeader()->setMinimumSectionSize(4);
 	frameList->verticalHeader()->setMinimumSectionSize(4);
 	frameList->setSelectionModel(selectModel);
+
+	// Clipboard
+	connect(actionCopyFrames,     SIGNAL( triggered() ), this, SLOT( copyFrameData() ));
+	connect(actionPasteFrames,    SIGNAL( triggered() ), this, SLOT( pasteFrameData() ));
+
 
 	//Controllers
 	connect( btnAddController,     SIGNAL( clicked() ), this, SLOT( updateControllerParts() ));
@@ -760,6 +765,37 @@ void AnimTool::refreshTable() {
 	supressEvents(true);
 	frameCount->setValue( anim? anim->frameCount(): 0 );
 	supressEvents(false);
+}
+
+//// //// //// //// //// //// //// //// Clipboard //// //// //// //// //// //// //// ////
+
+void AnimTool::copyFrameData() {
+	if(!m_project->currentAnimation() || !m_project->currentPart()) return; // Nothing to copy
+	Frame data = m_project->currentAnimation()->frameData(m_project->frame(), m_project->currentPart());
+	// Encode data
+	QString s = QString("ANIMFRAME: %1;%2;%3;%4").arg(data.mode).arg(data.angle).arg(data.offset.x()).arg(data.offset.y());
+	QApplication::clipboard()->setText( s );
+}
+
+void AnimTool::pasteFrameData() {
+	if(!m_project->currentAnimation() || !m_project->currentPart()) return; // Nowhere for it  to go
+	QString s = QApplication::clipboard()->text();
+	if(s.startsWith("ANIMFRAME: ")) {
+		QStringList d = s.remove(0,11).split(";");
+		Frame data;
+		data.mode = d[0].toInt();
+		data.angle = d[1].toFloat();
+		data.offset.setX(d[2].toFloat());
+		data.offset.setY(d[3].toFloat());
+
+		// Set data
+		Animation* anim = m_project->currentAnimation();
+		Part*      part = m_project->currentPart();
+		Frame      old  = anim->frameData(m_project->frame(), part);
+		data.visible = old.visible;
+		m_commands->push( new ChangeFrameData(anim, part, old, data) );
+		printf("Paste stuff %f\n", data.angle);
+	}
 }
 
 //// //// //// //// //// //// //// //// Onion Skin //// //// //// //// //// //// //// ////
