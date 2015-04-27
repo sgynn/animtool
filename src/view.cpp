@@ -20,6 +20,8 @@ View::View(QWidget* parent) : QGraphicsView(parent), m_edit(0), m_selected(0), m
 	m_lastOnion = 0;
 	m_frameChanged = false;
 	m_mode = 0;
+	m_autoKey = false;
+	m_hideNulls = false;
 }
 
 void View::createWidgets() {
@@ -92,6 +94,17 @@ void View::displayFrame(Animation* anim, int frame, int before, int after) {
 	setOnionSkin(before, after);
 }
 
+void View::showNulls(bool on) {
+	m_hideNulls = !on;
+	foreach(Part* p, m_project->parts()) {
+		if(p->isNull()) {
+			if(m_animation) {
+				p->setVisible( on && m_animation->frameData(m_frame, p).visible );
+			} else p->setVisible( on );
+		}
+	}
+}
+
 void View::updateAll(Animation* anim, int frame) {
 	//Reposition all parts
 	QList<int> parts = anim->parts();
@@ -144,7 +157,7 @@ void View::updatePart(Part* part, const Frame& data) {
 	part->setPos(pos);
 	moveChildren(part, deltaPos);
 	// visibility
-	part->setVisible( data.visible );
+	part->setVisible( data.visible && !m_hideNulls );
 	updateSelection();
 	m_frameChanged = true;
 }

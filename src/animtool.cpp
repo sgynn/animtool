@@ -71,6 +71,8 @@ AnimTool::AnimTool(QWidget* parent) {
 	connect(actionZoomIn,	SIGNAL(triggered()), this, SLOT(zoomIn()));
 	connect(actionZoomOut,	SIGNAL(triggered()), this, SLOT(zoomOut()));
 	connect(actionResetZoom,SIGNAL(triggered()), this, SLOT(resetZoom()));
+	connect(actionShowNulls,SIGNAL(triggered(bool)), view, SLOT( showNulls(bool) ));
+
 
 	//Parts treeview
 	QStandardItemModel* listModel = new QStandardItemModel();
@@ -511,7 +513,7 @@ void AnimTool::controllerStateChanged(QListWidgetItem* item) {
 	if(!anim) item->setCheckState( Qt::Checked );
 	else {
 		anim->setControllerState(item->data(Qt::UserRole).toInt(), item->checkState() == Qt::Checked);
-		setFrame(-1);
+		setFrame();
 	}
 }
 
@@ -649,23 +651,28 @@ void AnimTool::deleteFrame() {
 
 //// //// //// //// //// //// //// //// Details panel //// //// //// //// //// //// //// ////
 
+inline void setValue(QDoubleSpinBox* box, double value) {
+	if(!box->hasFocus()) box->setValue(value);
+}
+
 //// Update data from Part values ////
 void AnimTool::updateDetails(Part* part, int mask) {
+	if(m_project->currentPart() != part) return;
 	if(!part) return; // TODO Perhaps clear values?
 	supressEvents(true);
 	if(mask&1) { // Frame values
 		float    angle  = part->localAngle();
 		QPointF  offset = part->localOffset();
-		angleValue  -> setValue( angle );
-		offsetX     -> setValue( offset.x() );
-		offsetY     -> setValue( offset.y() );
+		setValue( angleValue, angle );
+		setValue( offsetX, offset.x() );
+		setValue( offsetY, offset.y() );
 		frameHidden -> setChecked( !part->isVisible() );
 	}
 	if(mask&2) { // Rest Values
-		pivotX      -> setValue( -part->offset().x() );
-		pivotY      -> setValue( -part->offset().y() );
-		positionX   -> setValue( part->rest().x() );
-		positionY   -> setValue( part->rest().y() ); 
+		setValue( pivotX, -part->offset().x() );
+		setValue( pivotY, -part->offset().y() );
+		setValue( positionX, part->rest().x() );
+		setValue( positionY, part->rest().y() );
 		partHidden  -> setChecked( part->hidden() );
 	}
 	if(mask&4) {// Keyframes?
@@ -794,7 +801,7 @@ void AnimTool::pasteFrameData() {
 		Frame      old  = anim->frameData(m_project->frame(), part);
 		data.visible = old.visible;
 		m_commands->push( new ChangeFrameData(anim, part, old, data) );
-		printf("Paste stuff %f\n", data.angle);
+		setFrame(); // update anything (ik)
 	}
 }
 

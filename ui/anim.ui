@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1205</width>
-    <height>1093</height>
+    <height>1118</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,6 +55,7 @@
     <addaction name="actionSceneInfo"/>
     <addaction name="separator"/>
     <addaction name="menuOnionSkin"/>
+    <addaction name="actionShowNulls"/>
     <addaction name="separator"/>
     <addaction name="actionZoomIn"/>
     <addaction name="actionZoomOut"/>
@@ -62,6 +63,7 @@
     <addaction name="separator"/>
     <addaction name="actionNextFrame"/>
     <addaction name="actionPreviousFrame"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuPart">
     <property name="title">
@@ -1190,16 +1192,6 @@
       </layout>
      </item>
      <item>
-      <widget class="QCheckBox" name="showNulls">
-       <property name="text">
-        <string>Show Null Parts</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -1886,6 +1878,20 @@
    </property>
    <property name="shortcut">
     <string>F5</string>
+   </property>
+  </action>
+  <action name="actionShowNulls">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Null Parts</string>
+   </property>
+   <property name="shortcut">
+    <string>F8</string>
    </property>
   </action>
  </widget>

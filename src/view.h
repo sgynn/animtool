@@ -17,19 +17,20 @@ class View : public QGraphicsView {
 	public:
 	View(QWidget* parent=0);
 
-	void setProject(Project* p) { m_project=p; }				//Set the current project
-	void createWidgets();							//Create info widgets
-	void setCommandStack(CommandStack* stack);				//Set the command stack
+	void setProject(Project* p) { m_project=p; }		// Set the current project
+	void createWidgets();								// Create info widgets
+	void setCommandStack(CommandStack* stack);			// Set the command stack
 
-	Part* partAt(const QPointF&);						//Get a part at a point (for selection)
+	Part* partAt(const QPointF&);						// Get a part at a point (for selection)
 
 	public slots:
-	void moveForward() { moveZ(-1); }					//Move selected part up
-	void moveBack() { moveZ(1); }						//Move selected part down
-	void moveZ(int z);							//Move up or down
-	void setMode(bool edit);						//Set edit mode
-	void selectItem(Part* item);						//Set the selected item
-	void setAutoKey(bool on) { m_autoKey=on; }				//Set autokey mode
+	void moveForward() { moveZ(-1); }					// Move selected part up
+	void moveBack() { moveZ(1); }						// Move selected part down
+	void moveZ(int z);									// Move up or down
+	void setMode(bool edit);							// Set edit mode
+	void selectItem(Part* item);						// Set the selected item
+	void setAutoKey(bool on) { m_autoKey=on; }			// Set autokey mode
+	void showNulls(bool show);							// Show or hide all null parts
 
 	void displayFrame(Animation* anim, int frame, int before=0,int after=0);//Display a frame
 	void updatePart(Part* part, const Frame& data);				//Update a part to framedata
@@ -49,18 +50,19 @@ class View : public QGraphicsView {
 	QGraphicsPathItem* m_outline;						//Selected part outline
 	Part* m_selected;							//Selected part
 
-	int m_mode; 	//1=move, 2=rotate					//Edit mode
-	QPointF m_moveOffset;							//Mouse offset for dragging
-	float m_angleOffset;							//Mouse offset for rotating
-	bool m_moved; 								//Mouse moved - for selecting stuff in view
-	bool m_autoKey;								//Automatically add keyframes
+	int m_mode; 	//1=move, 2=rotate			// Edit mode
+	QPointF m_moveOffset;						// Mouse offset for dragging
+	float m_angleOffset;						// Mouse offset for rotating
+	bool m_moved; 								// Mouse moved - for selecting stuff in view
+	bool m_autoKey;								// Automatically add keyframes
+	bool m_hideNulls;							// Override to hide nulls
 
-	Animation* m_animation;							//Current Animation
-	int m_frame;								//Current Frame
-	bool m_frameChanged;							//Has the current frame been modified
+	Animation* m_animation;						// Current Animation
+	int m_frame;								// Current Frame
+	bool m_frameChanged;						//Has the current frame been modified
 
-	QList<QGraphicsPixmapItem*> m_onion;					//The onion skin
-	unsigned int m_lastOnion;						//Last state of the onion skin
+	QList<QGraphicsPixmapItem*> m_onion;		// The onion skin
+	unsigned int m_lastOnion;					// Last state of the onion skin
 
 	void updateAll(Animation*, int frame);					//Update all parts to animation data
 	void updateSelection();							//Update selection widgets
