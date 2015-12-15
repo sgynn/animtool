@@ -157,7 +157,7 @@ void View::updatePart(Part* part, const Frame& data) {
 	part->setPos(pos);
 	moveChildren(part, deltaPos);
 	// visibility
-	part->setVisible( data.visible && !m_hideNulls );
+	part->setVisible( data.visible && !(part->isNull() && m_hideNulls) );
 	updateSelection();
 	m_frameChanged = true;
 }

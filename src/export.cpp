@@ -42,7 +42,7 @@ void Export::save() {
 		}
 		//build spritesheet
 		QPixmap* image = buildSpriteSheet(list, perLine->isChecked());
-		image->save(file);
+		if(image) image->save(file);
 	}
 }
 
@@ -89,6 +89,10 @@ QPixmap* Export::buildSpriteSheet( const QList<Animation*>& list, bool animPerRo
 
 	// Get bounds
 	QRect box = getBounds(list);
+	if(box.width()<0 || box.height()<0) {
+		printf("Error: Null image bounds\n");
+		return 0;
+	}
 
 	// Output image size
 	int iw, ih;
