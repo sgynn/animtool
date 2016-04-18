@@ -45,9 +45,15 @@ void IKController::apply(View* v) const {
 		float lb = distance(m_partB->pos(), m_head->pos());
 		float lg = distance(m_partA->pos(), m_goal->pos());
 
-		// out of range - lookat
-		if(lg >= la + lb || lg <= abs(la-lb)) {
+		// Target out of range - lookat
+		if(lg >= la + lb) {
 			lookat(v, m_partA, m_partB, m_goal->pos());
+			lookat(v, m_partB, m_head, m_goal->pos());
+		}
+		// Target too close
+		else if(lg <= fabs(la-lb)) {
+			QPointF otherWay = m_partA->pos() + (m_partA->pos() - m_goal->pos());
+			lookat(v, m_partA, m_partB, otherWay);
 			lookat(v, m_partB, m_head, m_goal->pos());
 		}
 		// In range - ik

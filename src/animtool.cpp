@@ -17,6 +17,10 @@ AnimTool::AnimTool(QWidget* parent) {
 	setupUi(this);
 	m_noEvent = 0;
 
+	// Fix initial window layout
+	frameControllers->hide();
+	
+
 	//Project
 	m_project = new Project(this);
 	view->setScene( m_project->scene() );
