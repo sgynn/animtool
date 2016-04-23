@@ -71,6 +71,7 @@ QRect Export::getBounds( const QList<Animation*>& list ) const {
 			if(i==0 && a==0) box = r; else box |= r;
 		}
 	}
+	box.adjust(0,0,box.width()&1? 1:0, box.height()&1?1:0);	// Hack: Make even
 	return box;
 }
 

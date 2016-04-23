@@ -45,6 +45,7 @@ class CommandStack : public QObject {
 	void updateView();				// Signal view to redraw
 	void updatePart(Part* part, const Frame& data);	// Signal that part data has been modified
 	void skipEvents(bool);				// Skip element changed events
+	void cleanStateChanged();			// Signal when the project is clea
 
 	protected:
 	Project* m_project;		// Current project

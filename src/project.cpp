@@ -13,6 +13,14 @@ Project::Project(QObject* parent) : QObject(parent),
 Project::~Project() {
 	clear();
 }
+QString Project::getTitle() const {
+	if(m_file.isEmpty()) return "untitled";
+	int l = m_file.lastIndexOf("/");
+	if(l>=0) return m_file.right( m_file.size() - l - 1);
+	l = m_file.lastIndexOf("\\");
+	if(l>=0) return m_file.right( m_file.size() - l - 1);
+	return m_file;
+}
 
 //// //// //// //// //// //// //// //// Part Functions //// //// //// //// //// //// //// ////
 

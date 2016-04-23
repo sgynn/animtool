@@ -56,6 +56,7 @@ class Project : public QObject {
 
 	QGraphicsScene* scene() { return &m_scene; }		// The graphical scene
 	const QString& getFile() const { return m_file; }	// Get the project filename
+	QString        getTitle() const;					// Get project filename without path
 
 	int frame() const { return m_currentFrame; }		// The current frame
 	void setFrame(int f) { m_currentFrame=f; }			// Set the current frame

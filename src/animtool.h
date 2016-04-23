@@ -36,6 +36,7 @@ class AnimTool : public QMainWindow, private Ui::MainWindow {
 	public slots:
 	
 	void supressEvents(bool=true);
+	void updateTitle();
 	
 	void newProject();
 	void loadProject();

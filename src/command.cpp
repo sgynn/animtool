@@ -43,6 +43,8 @@ void CommandStack::push(Command* cmd, bool execute) {
 
 	//Update action state and text
 	updateActions();
+
+	if(m_stack.size() == m_clean+1) cleanStateChanged();
 }
 
 void CommandStack::begin(const QString& name) {
@@ -70,6 +72,8 @@ void CommandStack::undo() {
 		m_stack.pop_back();
 		m_redo.push_back( cmd );
 		updateActions();
+
+		if(isClean()) cleanStateChanged();
 	}
 }
 void CommandStack::redo() {
@@ -81,11 +85,15 @@ void CommandStack::redo() {
 		m_redo.pop_back();
 		m_stack.push_back( cmd );
 		updateActions();
+
+		if(isClean()) cleanStateChanged();
 	}
 
 }
 void CommandStack::setClean() {
+	if(m_clean == m_stack.size()) return;
 	m_clean = m_stack.size();
+	cleanStateChanged();
 }
 void CommandStack::clear() {
 	for(int i=0; i<m_stack.size(); i++) delete m_stack[i];

@@ -47,6 +47,7 @@ AnimTool::AnimTool(QWidget* parent) {
 	connect( m_commands, SIGNAL( updateView() ), this, SLOT( setFrame() ));
 	connect( m_commands, SIGNAL( updatePart(Part*, const Frame&) ), view, SLOT( updatePart(Part*, const Frame&) ));
 	connect( m_commands, SIGNAL( updatePart(Part*, const Frame&) ), this, SLOT( updateDetails(Part*) ));
+	connect( m_commands, SIGNAL( cleanStateChanged() ), this, SLOT( updateTitle() ));
 	view->setCommandStack( m_commands );
 
 	//Debug
@@ -218,6 +219,11 @@ QStandardItem* AnimTool::findItem(QAbstractItemModel* amodel, const QString& tex
 
 //// //// //// //// //// //// //// //// File Commands //// //// //// //// //// //// //// ////
 
+void AnimTool::updateTitle() {
+	printf("Update title\n");
+	setWindowTitle("Animation Tool - " + m_project->getTitle() + (m_commands->isClean()? "": "*"));
+}
+
 bool AnimTool::confirmClose() {
 	if(m_commands->isClean()) return true; //Clean project - no need to ask
 	QMessageBox msg;
@@ -248,6 +254,7 @@ void AnimTool::loadProject() {
 		clearProject();
 		m_project->loadProject(file);
 		m_commands->setClean();
+		updateTitle();
 	}
 }
 void AnimTool::saveProject() {
