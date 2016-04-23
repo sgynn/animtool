@@ -17,8 +17,10 @@ AnimTool::AnimTool(QWidget* parent) {
 	setupUi(this);
 	m_noEvent = 0;
 
-	// Fix initial window layout
-	frameControllers->hide();
+	// Fix initial window layout as Qt Designer can't do this
+	tabifyDockWidget(frameParts, frameControllers);
+	frameSceneInfo->hide();
+	frameParts->raise();
 	
 
 	//Project
@@ -46,6 +48,7 @@ AnimTool::AnimTool(QWidget* parent) {
 	connect( m_commands, SIGNAL( updateTable() ), this, SLOT( refreshTable() ));
 	connect( m_commands, SIGNAL( updateView() ), this, SLOT( setFrame() ));
 	connect( m_commands, SIGNAL( updatePart(Part*, const Frame&) ), view, SLOT( updatePart(Part*, const Frame&) ));
+	connect( m_commands, SIGNAL( updatePart(Part*, const Frame&) ), view, SLOT( updateControllers() ));
 	connect( m_commands, SIGNAL( updatePart(Part*, const Frame&) ), this, SLOT( updateDetails(Part*) ));
 	connect( m_commands, SIGNAL( cleanStateChanged() ), this, SLOT( updateTitle() ));
 	view->setCommandStack( m_commands );
@@ -136,9 +139,9 @@ AnimTool::AnimTool(QWidget* parent) {
 	//Controllers
 	connect( btnAddController,     SIGNAL( clicked() ), this, SLOT( updateControllerParts() ));
 	connect( btnRemoveController,  SIGNAL( clicked() ), this, SLOT( removeController() ));
-	connect( controllerPartA,      SIGNAL( currentIndexChanged(int) ), this, SLOT( updateControllerParts() ));
-	connect( controllerPartB,      SIGNAL( currentIndexChanged(int) ), this, SLOT( updateControllerParts() ));
-	connect( controllerHead,       SIGNAL( currentIndexChanged(int) ), this, SLOT( updateControllerParts() ));
+	connect( controllerPartA,      SIGNAL( currentIndexChanged(int) ), this, SLOT( updateControllerParts(int) ));
+	connect( controllerPartB,      SIGNAL( currentIndexChanged(int) ), this, SLOT( updateControllerParts(int) ));
+	connect( controllerHead,       SIGNAL( currentIndexChanged(int) ), this, SLOT( updateControllerParts(int) ));
 	connect( controllerPartA,      SIGNAL( currentIndexChanged(int) ), this, SLOT( validateController() ));
 	connect( controllerPartB,      SIGNAL( currentIndexChanged(int) ), this, SLOT( validateController() ));
 	connect( controllerHead,       SIGNAL( currentIndexChanged(int) ), this, SLOT( validateController() ));
@@ -570,7 +573,15 @@ void AnimTool::updateControllerList(int id) {
 inline int getSelectedPartID(QComboBox* box) {
 	return box->itemData( box->currentIndex() ).toInt();
 }
-void AnimTool::updateControllerParts() {
+void AnimTool::updateControllerParts(int flag) {
+	// Clear lists
+	if(flag<0) {
+		controllerPartA->setCurrentIndex(-1);
+		controllerPartB->setCurrentIndex(-1);
+		controllerHead->setCurrentIndex(-1);
+		controllerGoal->setCurrentIndex(-1);
+	}
+
 	// Fill part list A
 	int last = getSelectedPartID(controllerPartA);
 	fillControllerParts(controllerPartA, 0, last, false);

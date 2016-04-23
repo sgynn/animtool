@@ -63,7 +63,7 @@ class AnimTool : public QMainWindow, private Ui::MainWindow {
 
 	void controllerSelected();
 	void updateControllerList(int);
-	void updateControllerParts();
+	void updateControllerParts(int = -1);
 	void addController();
 	void removeController();
 	void fillControllerParts(QComboBox*, Part*, int, bool);

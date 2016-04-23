@@ -44,6 +44,7 @@ bool Project::loadProject(const QString& filename) {
 			int head  = attr.namedItem("head").nodeValue().toInt();
 			int goal  = attr.namedItem("goal").nodeValue().toInt();
 			setController(id, getPart(partA), getPart(partB), getPart(head), getPart(goal));
+			if(id > m_controllerValue) m_controllerValue = id;
 		}
 	}
 	

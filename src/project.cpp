@@ -242,6 +242,7 @@ void Project::clear() {
 	foreach(IKController* c, m_controllers) delete c;
 	m_controllers.clear();
 	changedController(-1);
+	m_controllerValue = 1;
 
 
 	//Reset other values
