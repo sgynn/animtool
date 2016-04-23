@@ -24,8 +24,8 @@ class View : public QGraphicsView {
 	Part* partAt(const QPointF&);						// Get a part at a point (for selection)
 
 	public slots:
-	void moveForward() { moveZ(-1); }					// Move selected part up
-	void moveBack() { moveZ(1); }						// Move selected part down
+	void moveForward()  { moveZ(-1); }					// Move selected part up
+	void moveBackward() { moveZ( 1); }					// Move selected part down
 	void moveZ(int z);									// Move up or down
 	void setMode(bool edit);							// Set edit mode
 	void selectItem(Part* item);						// Set the selected item

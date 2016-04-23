@@ -139,7 +139,22 @@ void MovePart::move(int parentID) {
 
 
 
+//// //// //// //// //// //// //// //// Z Order //// //// //// //// //// //// //// ////
 
-
+ChangeZOrder::ChangeZOrder(Part* part, int z) : PartCommand(part), m_oldZ(-1), m_newZ(z) {
+}
+void ChangeZOrder::execute() {
+	m_oldZ = project()->scene()->items().indexOf( getPart() );
+	setZ( m_newZ, m_newZ > m_oldZ );
+}
+void ChangeZOrder::undo() {
+	setZ( m_oldZ, m_oldZ > m_newZ );
+}
+void ChangeZOrder::setZ(int z, bool behind) {
+	QGraphicsItem* itm = project()->scene()->items()[z];
+	if(behind) getPart()->stackBefore( itm );
+	else itm->stackBefore( getPart() );
+	project()->scene()->invalidate( project()->scene()->sceneRect() );
+}
 
 

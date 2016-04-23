@@ -82,5 +82,16 @@ class MovePart : public PartCommand {
 	QTreeView* m_list;
 };
 
+class ChangeZOrder : public PartCommand {
+	public:
+	ChangeZOrder(Part* part, int z);
+	QString text() const { return "change Z order"; }
+	void execute();
+	void undo();
+	protected:
+	void setZ(int z, bool behind);
+	int m_oldZ, m_newZ;
+};
+
 #endif
 

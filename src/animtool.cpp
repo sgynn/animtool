@@ -99,7 +99,7 @@ AnimTool::AnimTool(QWidget* parent) {
 	connect( actionCloneHeirachy, SIGNAL( triggered() ), this, 		SLOT( cloneHeirachy() ));
 	connect( actionDeletePart,    SIGNAL( triggered() ), this, 		SLOT( removePart() ));
 	connect( actionMoveForward,   SIGNAL( triggered() ), view, 		SLOT( moveForward() ));
-	connect( actionMoveBack,      SIGNAL( triggered() ), view, 		SLOT( moveBack() ));
+	connect( actionMoveBackward,  SIGNAL( triggered() ), view, 		SLOT( moveBackward() ));
 	connect( actionEditMode,      SIGNAL( triggered(bool) ), view, 	SLOT( setMode(bool)) );
 	partInfo->hide();
 
@@ -223,7 +223,6 @@ QStandardItem* AnimTool::findItem(QAbstractItemModel* amodel, const QString& tex
 //// //// //// //// //// //// //// //// File Commands //// //// //// //// //// //// //// ////
 
 void AnimTool::updateTitle() {
-	printf("Update title\n");
 	setWindowTitle("Animation Tool - " + m_project->getTitle() + (m_commands->isClean()? "": "*"));
 }
 
@@ -340,7 +339,7 @@ void AnimTool::updatePartSelection() {
 	actionClonePart		-> setEnabled( enabled );
 	actionCloneHeirachy	-> setEnabled( enabled );
 	actionMoveForward	-> setEnabled( enabled );
-	actionMoveBack		-> setEnabled( enabled );
+	actionMoveBackward  -> setEnabled( enabled );
 	partInfo			-> setEnabled( enabled );
 	frameInfo			-> setEnabled( enabled && m_project->currentAnimation() );
 	partPivot			-> setEnabled( enabled && !part->isNull() );

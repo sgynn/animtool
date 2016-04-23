@@ -491,7 +491,7 @@
   </widget>
   <widget class="QDockWidget" name="frameAnimations">
    <property name="windowTitle">
-    <string>Animation</string>
+    <string>Animations</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>

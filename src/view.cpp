@@ -258,14 +258,16 @@ void View::moveZ(int z) { //TODO Undo for this.
 	QList<QGraphicsItem*> items = scene()->items();
 	//Find item
 	int index = items.indexOf(m_selected);
-	//Move item
+	// Determine target z index
 	for(int i=index+z; i>=0 && i<items.size(); i+=z) {
 		QGraphicsItem* item = items[i];
 		if(m_selected->collidesWithItem(item)) {
-			if(z<0) item->stackBefore(m_selected);
-			else m_selected->stackBefore(item);
-			scene()->invalidate( sceneRect() );
+			pushCommand( new ChangeZOrder(m_selected, i) );
 			break;
+
+			//if(z<0) item->stackBefore(m_selected);
+			//else m_selected->stackBefore(item);
+			//scene()->invalidate( sceneRect() );
 		}
 	}
 }
